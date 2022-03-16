@@ -110,7 +110,7 @@ $print = new SurveyPrint();
 $print -> printArray($data);
 
 $fileStorage = new SurveyFileStorage();
-$path = './data/' . $data["Email"] . ".txt";
+$path = './' . $data["Email"] . ".txt";
 $fileStorage->writef($path, $data);
 
 echo "<br>";
