@@ -50,47 +50,79 @@ class SurveyFileStorage
         return $parsedArr;
     }
 
-    public function readf(string $path) 
+    private function formatArray($props) 
     {
-        $elements = [];
-        $text = '';
-        $fp = fopen($path, 'r');
-        if ($fp) 
-        {
-            while (($buffer = fgets($fp, 4096)) !== false) 
-            {
-                $elements[] = str_replace("\n", '', $buffer);
-            }
-        }
-        fclose($fp);
-        for ($i = 0; $i < count($elements) - 1; $i++) 
-        {
-            $text .= $elements[$i] . "&";
-            if ($i === (count($elements) - 2)) 
-            {
-                $text .= $elements[$i + 1];
-            }
-        }
-        return $this->parseString($text, "&", ": ");
+        return [
+            "Email" => $props["Email"] ? $props["Email"] : "",
+            "First Name" => $props["First Name"] ? $props["First Name"] : "",
+            "Last Name" => $props["Last Name"] ? $props["Last Name"] : "",
+            "Age" => $props["Age"] ? $props["Age"] : ""        
+        ];
     }
 
-    public function writef(string $path, array $array) 
+    public function readf(Survey $user) 
     {
-        $keys = ["First Name", "Last Name", "Email", "Age"];
-        $resString = "";
-        for ($i = 0; $i < count($array); $i++) 
+        $props = $user->getDataArray();
+        if  ($props["Email"] <> "") 
         {
-            $value = $array[$keys[$i]];
-            $resString .= $keys[$i] . ': ' . $value . "\n";
+            $path = './' . $props["Email"] . ".txt";
+            $elements = [];
+            $text = '';
+            $fp = fopen($path, 'r');
+            if ($fp) 
+            {
+                while (($buffer = fgets($fp, 4096)) !== false) 
+                {
+                    $elements[] = str_replace("\n", '', $buffer);
+                }
+                fclose($fp);
+                for ($i = 0; $i < count($elements) - 1; $i++) 
+                {
+                    $text .= $elements[$i] . "&";
+                    if ($i === (count($elements) - 2)) 
+                    {
+                        $text .= $elements[$i + 1];
+                    }
+                }
+                $array = $this->formatArray($this->parseString($text, "&", ": "));
+                return new Survey($array["First Name"], $array["Last Name"], $array["Email"], $array["Age"]);    
+            }
         }
-        file_put_contents($path, $resString);
+        return new Survey();
+    }
+
+    public function writef(Survey $user) 
+    {
+        $props = $user->getDataArray();
+        if ($props["Email"] <> "") 
+        {
+            $path = './' . $props["Email"] . ".txt";
+            $resString = "";
+            $keys = ["First Name", "Last Name", "Email", "Age"];
+            $curProps = $this->formatArray($props);
+            if (file_exists($path)) 
+            {
+                $prevProps = $this->formatArray($this->readf($user)->getDataArray());
+            } 
+            else 
+            {
+                $prevProps = $this->formatArray([]);
+            }
+            for ($i = 0; $i < count($curProps); $i++) 
+            {
+                $value = $curProps[$keys[$i]] === "" ? $prevProps[$keys[$i]] : $curProps[$keys[$i]];
+                $resString .= $keys[$i] . ": " . $value . "\n";
+            }
+            file_put_contents($path, $resString);
+        }
     } 
 }
 
 class SurveyPrint
 {
-    public function printArray(array $array) 
+    public function printArray(Survey $user) 
     {
+        $array = $user -> getDataArray();
         $keys = ["First Name", "Last Name", "Email", "Age"];
         $resString = "";
         for ($i = 0; $i < count($array); $i++) 
@@ -103,16 +135,14 @@ class SurveyPrint
 }
 
 $request = new RequestSurveyLoader();
-$survey = $request -> getParametrs();
-$data = $survey -> getDataArray();
-
 $print = new SurveyPrint();
-$print -> printArray($data);
-
 $fileStorage = new SurveyFileStorage();
-$path = './' . $data["Email"] . ".txt";
-$fileStorage->writef($path, $data);
 
+
+$survey = $request -> getParametrs();
+$print -> printArray($survey);
+$fileStorage->writef($survey);
+    
 echo "<br>";
-$data = $fileStorage->readf($path);
+$data = $fileStorage->readf($survey);
 $print -> printArray($data);
