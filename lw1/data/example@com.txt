@@ -1,4 +1,0 @@
-First Name: dima
-Last Name: Kirilov
-Age: 17
-Email: example@com
