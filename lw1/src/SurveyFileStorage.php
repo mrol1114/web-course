@@ -1,24 +1,28 @@
 <?php
 class SurveyFileStorage 
 {
-    private array $keys = ["First Name", "Last Name", "Email", "Age"];
-    private string $separator = "&";
-    private string $assignment = ": ";
-    private string $base = "./data/";
+    private const SEPARATOR = '&';
+    private const ASSIGNMENT = ': ';
+    private const BASE = './data/';
+    private const FILE_SEPARATOR = "\n";
+    private const FILE_FIRST_NAME = 'First Name';
+    private const FILE_LAST_NAME = 'Last Name';
+    private const FILE_AGE = 'Age';
+    private const FILE_EMAIL = 'Email';
 
     public function loadSurvey(Survey $survey) : Survey 
     {
-        $path = $this->base . $survey->getEmail() . ".txt";
+        $path = self::BASE . $survey->getEmail() . '.txt';
 
         if  (file_exists($path)) 
         {
-            $fp = fopen($path, "r");
+            $fp = fopen($path, 'r');
             if ($fp) 
             {
                 $text = $this->readFileToString($fp);
                 fclose($fp);
-                $array = $this->formatArray($this->splitStringToArray($text, $this->separator, $this->assignment));
-                return new Survey($array["First Name"], $array["Last Name"], $array["Email"], $array["Age"]);    
+                $array = $this->splitStringToArray($text, self::SEPARATOR, self::ASSIGNMENT);
+                return new Survey($array[self::FILE_FIRST_NAME], $array[self::FILE_LAST_NAME], $array[self::FILE_EMAIL], $array[self::FILE_AGE]);
             }
         }
 
@@ -29,37 +33,42 @@ class SurveyFileStorage
     {
         $email = $survey->getEmail();
 
-        if (!is_dir(substr($this->base, 2, -1)))
+        if (!is_dir(substr(self::BASE, 2, -1)))
         {
-            mkdir(substr($this->base, 2, -1));
+            mkdir(substr(self::BASE, 2, -1));
         }
 
-        if ($email !== "") 
+        if ($email !== '')
         {
-            $path = $this->base . $email . ".txt";
-            $text = $this->makeStringToSave($survey);
+            $path = self::BASE . $email . '.txt';
+            $prevSurvey = $this->loadSurvey($survey);
+            $text = $this->makeStringToSave($survey, $prevSurvey);
             file_put_contents($path, $text);
         }
     }
 
-    private function makeStringToSave(Survey $survey) : string 
+    private function makeStringToSave(Survey $survey, Survey $prevSurvey) : string
     {
-        $text = "";
-        $prevSurvey = $this->loadSurvey($survey);
-        for ($i = 0; $i < count($this->keys); $i++) 
+        $resString = '';
+        $values = [
+            self::FILE_FIRST_NAME => $survey->getFirstName() !== '' ? $survey->getFirstName() : $prevSurvey->getFirstName(),
+            self::FILE_LAST_NAME => $survey->getLastName() !== '' ? $survey->getLastName() : $prevSurvey->getLastName(),
+            self::FILE_AGE => $survey->getAge() !== '' ? $survey->getAge() : $prevSurvey->getAge(),
+            self::FILE_EMAIL => $survey->getEmail() !== '' ? $survey->getEmail() : $prevSurvey->getEmail(),
+        ];
+        foreach (array_keys($values) as $key)
         {
-            $value = $survey->getParametr($this->keys[$i]) === "" ? $prevSurvey->getParametr($this->keys[$i]) : $survey->getParametr($this->keys[$i]);
-            $text .= $this->keys[$i] . $this->assignment . $value . "\n";
+            $resString .= $key . self::ASSIGNMENT . $values[$key] . self::FILE_SEPARATOR;
         }
-        return $text;
+        return $resString;
     }
 
     private function readFileToString($fp) : string
     {
-        $text = "";
-        while (($buffer = fgets($fp, 4096)) !== false) 
+        $text = '';
+        while ($buffer = fgets($fp, 4096))
         {
-            $text .= str_replace("\n", "", $buffer) . $this->separator;
+            $text .= str_replace("\n", '', $buffer) . self::SEPARATOR;
         }
         return substr($text, 0, -1);
     }
@@ -70,19 +79,9 @@ class SurveyFileStorage
         $parsedArr = [];
         foreach ($arr as $value) 
         {
-            $para = explode($assignment, $value);
-            $parsedArr[$para[0]] = $para[1];
+            $pair = explode($assignment, $value);
+            $parsedArr[$pair[0]] = $pair[1];
         } 
         return $parsedArr;
     }
-
-    private function formatArray($props) : array
-    {
-        return [
-            "Email" => $props["Email"] ? $props["Email"] : "",
-            "First Name" => $props["First Name"] ? $props["First Name"] : "",
-            "Last Name" => $props["Last Name"] ? $props["Last Name"] : "",
-            "Age" => $props["Age"] ? $props["Age"] : ""        
-        ];
-    } 
 }

@@ -1,40 +1,36 @@
 <?php
 class Survey
 {
-    private array $parametrs;
+    private string $firstName;
+    private string $lastName;
+    private string $age;
+    private string $email;
 
-    function __construct(string $firstName = "", string $lastName = "", string $email = "", string $age = "")
+    function __construct(string $firstName = '', string $lastName = '', string $email = '', string $age = '')
     {
-        $this->parametrs = [
-            "First Name" => $firstName,
-            "Last Name" => $lastName,
-            "Email" => $email,
-            "Age" => $age,    
-        ];
-    }
-
-    public function getParametr(string $key) : string
-    {
-        return $this->parametrs[$key];
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+        $this->age = $age;
+        $this->email = $email;
     }
 
     public function getFirstName() : string 
     {
-        return $this->parametrs["First Name"];
+        return $this->firstName;
     }
 
     public function getLastName() : string 
     {
-        return $this->parametrs["Last Name"];
+        return $this->lastName;
     }
 
     public function getAge() : string 
     {
-        return $this->parametrs["Age"];
+        return $this->age;
     }
 
     public function getEmail() : string 
     {
-        return $this->parametrs["Email"];
+        return $this->email;
     }
 }
