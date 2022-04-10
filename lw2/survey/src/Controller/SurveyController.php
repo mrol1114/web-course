@@ -2,48 +2,35 @@
 
 namespace App\Controller;
 
+use App\Service\Survey\InterfaceSurvey;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use App\Module\Survey\Survey;
-use App\Module\Survey\SurveyLoader;
-use App\Module\Survey\SurveyFileStorage;
 
 class SurveyController extends AbstractController
 {
-    public function saveSurvey(Request $request): Response
+    public function saveSurvey(InterfaceSurvey $surveyServices): Response
     {
-        $requestSurvey = new SurveyLoader();
-        $fileStorage = new SurveyFileStorage();
-
-        $survey =  $requestSurvey->makeSurveyFromRequest($request);
-        $fileStorage->saveSurvey($survey);
-        $values = [$survey->getFirstName(), $survey->getLastName(), $survey->getAge(), $survey->getEmail()];
+        $values = $surveyServices->saveSurvey();
         return $this->render('upload.html.twig',
             [
-                'firstName' => $values[0],
-                'lastName' => $values[1],
-                'age' => $values[2],
-                'email' => $values[3],
+                'firstName' => $values['firstName'],
+                'lastName' => $values['lastName'],
+                'age' => $values['age'],
+                'email' => $values['email'],
             ]
         );
     }
 
-    public function printSurvey(Request $request): Response
+    public function printSurvey(InterfaceSurvey $surveyServices): Response
     {
-        $requestSurvey = new SurveyLoader();
-        $fileStorage = new SurveyFileStorage();
-
-        $survey = $requestSurvey->makeSurveyFromRequest($request);
-        $loadedSurvey = $fileStorage->loadSurvey($survey);
-        $values = [$loadedSurvey->getFirstName(), $loadedSurvey->getLastName(), $loadedSurvey->getAge(), $loadedSurvey->getEmail(), $survey->getEmail()];
+        $values = $surveyServices->printSurvey();
         return $this->render('load.html.twig',
             [
-                'fileFirstName' => $values[0],
-                'fileLastName' => $values[1],
-                'fileAge' => $values[2],
-                'fileEmail' => $values[3],
-                'email' => $values[4],
+                'fileFirstName' => $values['fileFirstName'],
+                'fileLastName' => $values['fileLastName'],
+                'fileAge' => $values['fileAge'],
+                'fileEmail' => $values['fileEmail'],
+                'email' => $values['email'],
             ]
         );
     }

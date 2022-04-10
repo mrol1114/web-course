@@ -1,14 +1,13 @@
 <?php
 namespace App\Module\Survey;
-use Symfony\Component\HttpFoundation\Request;
 class SurveyLoader
 {
-    public function makeSurveyFromRequest(Request $request) : Survey
+    public function makeSurveyFromRequest() : Survey
     {
-        $firstName = $request->get('first_name') ?? '';
-        $lastName = $request->get('last_name') ?? '';
-        $email = $request->get('email') ?? '';
-        $age = $request->get('age') ?? '';
+        $firstName = $_GET['first_name'] ?? '';
+        $lastName = $_GET['last_name'] ?? '';
+        $email = $_GET['email'] ?? '';
+        $age = $_GET['age'] ?? '';
         return new Survey($firstName, $lastName, $email, $age);
     }
 }

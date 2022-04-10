@@ -87,7 +87,7 @@
         "version": "4.5.1"
     },
     "monolog/monolog": {
-        "version": "2.4.0"
+        "version": "2.5.0"
     },
     "nikic/php-parser": {
         "version": "v4.13.2"
@@ -102,7 +102,7 @@
         "version": "1.6.1"
     },
     "phpstan/phpdoc-parser": {
-        "version": "1.4.2"
+        "version": "1.4.3"
     },
     "psr/cache": {
         "version": "1.0.1"
