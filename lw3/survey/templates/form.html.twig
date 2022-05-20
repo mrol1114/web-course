@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Welcome!{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Roboto+Condensed&display=swap" rel="stylesheet">
+</head>
+<body>
+  {% block body %}
+    <div class="modal">
+      <div class="modal__dialog">
+        <form class="modal__content" enctype="multipart/form-data" action="/save-survey" method="post">
+          <h1 class="modal__header">Записаться на курс</h1>
+          <input class="modal__input" type="text" name="first_name" placeholder="Ваше имя"/>
+          <input class="modal__input" type="text" name="last_name" placeholder="Ваша фамилия"/>
+          <input class="modal__input" type="text" name="age" placeholder="Возраст"/>
+          <input class="modal__input" type="email" name="email" placeholder="Email" required/>
+          <input class="modal__input" type="file" accept="image/*" name="img" placeholder="Картинка"/>
+          <input class="modal__submit" type="submit" value="Записаться на курс">
+        </form>
+      </div>
+    </div>
+  {% endblock %}
+</body>
+</html>
