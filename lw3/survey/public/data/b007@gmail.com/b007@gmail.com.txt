@@ -1,5 +1,0 @@
-First Name: awdad
-Last Name: Oleg
-Age: 16
-Email: b007@gmail.com
-Image Id: 628692a38fa0f2.27730304

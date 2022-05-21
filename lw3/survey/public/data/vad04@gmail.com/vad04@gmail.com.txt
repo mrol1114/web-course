@@ -1,0 +1,5 @@
+First Name: Вадим
+Last Name: Крюков
+Age: 16
+Email: vad04@gmail.com
+Image Id: 6288e5f8808e24.79758386

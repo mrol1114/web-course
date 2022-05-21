@@ -13,8 +13,8 @@ class PhotoStorage
 
     public function saveImg(Request $request, string $key, string $email): string
     {
-        $file = $_FILES[$key] ?? null;
-        if ($file && $file['error'] === 0 && $file['size'] < self::FILE_SIZE && $file['type'] === self::MIME_FILE_TYPE)
+        $file = $request->files->get($key) ?? null;
+        if ($file && $file->getError() === 0 && $file->getClientMimeType() === self::MIME_FILE_TYPE && $file->getMaxFilesize() < self::FILE_SIZE)
         {
             if (!is_dir(self::BASE . '/' . $email))
             {
@@ -22,7 +22,7 @@ class PhotoStorage
             }
             $imageId = $this->generateId();
             $toPath = $this->createImageLink($imageId, $email);
-            move_uploaded_file($file['tmp_name'], $toPath);
+            move_uploaded_file($file->getPathName(), $toPath);
             return $imageId;
         }
         return '';
